@@ -31,3 +31,18 @@ Or by using the provided pip-requirements file:
 ```
 pip -r requirements.txt
 ```
+
+
+## Usage
+
+The usage is as follows:
+
+```
+./disas-shellcode.py <shellcode_filename>
+```
+
+Optionally, the following two parameters can be supplied to respectively: specify the offset and length of the shellcode (should it only be a portion of the source file), set the architecture to be 32-bit.
+
+```
+./disas-shellcode.py <shellcode_filename> --offset <value> --length <value> --x86
+```
