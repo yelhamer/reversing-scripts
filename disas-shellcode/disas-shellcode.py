@@ -8,10 +8,10 @@ from capstone import *
 def parseArgs():
     # parse args
     parser = argparse.ArgumentParser("disas-shellcode.py", description="Disassemble a portion of a file, with the option to xor it with a specified value before disassembly")
-    parser.add_argument("shellcode_file", help="The file which contains the shellcode to be disassembled")
-    parser.add_argument("--offset", default=0, help="Specify the offset from which the to-be-disassembled shellcode starts")
-    parser.add_argument("--length", default=-1, help="Specify how many bytes should be disassembled starting from the offset")
-    parser.add_argument("--xor", default=False, help="xor the shellcode with a value (Example: 0xdeadf). The value must be in hex and preceeded by 0x")
+    parser.add_argument('shellcode_file', help="The file which contains the shellcode to be disassembled")
+    parser.add_argument('-o', '--offset', default=0, help="Specify the offset from which the to-be-disassembled shellcode starts")
+    parser.add_argument('-l', '--length', default=-1, help="Specify how many bytes should be disassembled starting from the offset")
+    parser.add_argument('-x', '--xor', default=False, help="xor the shellcode with a value (Example: 0xdeadf). The value must be in hex and preceeded by 0x")
     parser.add_argument("--x86", action="store_true", help="Specify the target platform to be 32-bit (default is 64-bit")
 
     return parser.parse_args()
