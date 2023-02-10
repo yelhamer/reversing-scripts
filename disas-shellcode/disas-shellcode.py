@@ -21,26 +21,37 @@ def parseArgs():
 def main():
     # get parsed args
     args = parseArgs()
+    length = int(args.length)
+    offset = int(args.offset, 16)
 
     # read the shellcode from the file
     with open(args.shellcode_file, "rb+") as f:
         code = list(f.read())
-        if args.length < 0:
-            code = code[args.offset:-1]
+        if length < 0:
+            code = code[offset:-1]
         else:
-            code = code[args.offset:args.offset+args.length]
+            code = code[offset:offset+length]
         
     # xor the shellcode if requested
     if args.xor:
+        # format the xor argument
+        if len(args.xor) % 2 == 0:
+            xor_value = args.xor[2:]
+        else:
+            xor_value = "0"+args.xor[2:]
+
         # slice the provided hex value into bytes
-        xor_value = [args.xor[i:i+2] for i in range(2, len(xor_value), 2)]
-        xor_value = map(lambda x: int(x, 16), xor_value)
-        xor_value = list(xor_value)
+        xor_value = [xor_value[i:i+2] for i in range(0, len(xor_value), 2)]
+        xor_value = list(map(lambda x: int(x, 16), xor_value))
+        xor_value = list(reversed(xor_value))
+
         # set modulo according to which the shellcode will be xored
         step = len(xor_value)
+        
         # xor the shellcode one chunk at a time
         for i in range(0, len(code), step):
             code[i:i+step] = [j ^ k for j, k in zip(code[i:i+step], xor_value)]
+
 
     # create capstone's disassembler object
     if args.x86:
@@ -49,6 +60,7 @@ def main():
         md = Cs(CS_ARCH_X86, CS_MODE_64)
 
     # disassemble the shellcode
+    print("[Disassembly]:")
     disassembly = md.disasm(bytes(code), 0x1000)
     for inst in disassembly:
         print(f"{hex(inst.address)}: \t{inst.mnemonic}\t{inst.op_str}")
