@@ -16,6 +16,22 @@ def parseArgs():
 
     return parser.parse_args()
 
+# Disassemble
+def disas(code, isx86=False):
+    # create the capstone disassembler object
+    if isx86:
+        md = Cs(CS_ARCH_X86, CS_MODE_32)
+    else:
+        md = Cs(CS_ARCH_X86, CS_MODE_64)
+
+    # disassemble the shellcode and group-up the instructions into an array
+    instructions = []
+    disassembly = md.disasm(bytes(code), 0x1000)
+    for inst in disassembly:
+        instructions.append(f"{hex(inst.address)}: \t{inst.mnemonic}\t{inst.op_str}")
+
+    return instructions
+
 
 # Main function
 def main():
@@ -52,18 +68,11 @@ def main():
         for i in range(0, len(code), step):
             code[i:i+step] = [j ^ k for j, k in zip(code[i:i+step], xor_value)]
 
-
-    # create capstone's disassembler object
-    if args.x86:
-        md = Cs(CS_ARCH_X86, CS_MODE_32)
-    else:
-        md = Cs(CS_ARCH_X86, CS_MODE_64)
-
-    # disassemble the shellcode
-    print("[Disassembly]:")
-    disassembly = md.disasm(bytes(code), 0x1000)
-    for inst in disassembly:
-        print(f"{hex(inst.address)}: \t{inst.mnemonic}\t{inst.op_str}")
+    # disassemble the code and print the instructions
+    print("[Disassembly]")
+    instructions = disas(code, isx86=args.x86)
+    for inst in instructions:
+        print(inst)
 
 
 # Entry point
